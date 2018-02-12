@@ -18,7 +18,6 @@ import { recordTracksEvent } from 'state/analytics/actions';
 import { closePostRevisionsDialog, selectPostRevision } from 'state/posts/revisions/actions';
 import EditorRevisions from 'post-editor/editor-revisions';
 import Dialog from 'components/dialog';
-
 import CloseOnEscape from 'components/close-on-escape';
 
 class PostRevisionsDialog extends PureComponent {
@@ -86,9 +85,8 @@ class PostRevisionsDialog extends PureComponent {
 	};
 
 	onEscape = () => {
-		console.log('onEscape')
 		invoke( this.props, 'closeDialog' );
-	}
+	};
 
 	render() {
 		const { isVisible, closeDialog } = this.props;
