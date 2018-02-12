@@ -14,12 +14,13 @@ import Gridicon from 'gridicons';
  */
 import Dialog from 'components/dialog';
 import Button from 'components/button';
-import { getTranslationData } from './utils.js';
+import { getTranslationData, getTranslationGlotPressUrl } from './utils.js';
 
 class Translatable extends Component {
 	state = {
 		showDialog: false,
 		originalData: {},
+		formState: {},
 	};
 
 	hasDataLoaded() {
@@ -29,8 +30,8 @@ class Translatable extends Component {
 	handleTranslationChange = event => {
 		const { name, value } = event.target;
 		this.setState( {
-			originalData: {
-				...this.state.translationData,
+			formState: {
+				...this.state.formState,
 				[ name ]: value,
 			},
 		} );
@@ -46,7 +47,14 @@ class Translatable extends Component {
 		const { singular, context, plural, locale } = this.props;
 		! this.hasDataLoaded() &&
 			getTranslationData( locale.langSlug, { singular, context, plural } ).then( originalData =>
-				this.setState( { originalData } )
+				this.setState( {
+					originalData,
+					translationUrl: getTranslationGlotPressUrl( locale.langSlug, originalData.originalId ),
+					formState: {
+						translatedSingular: originalData.translatedSingular,
+						translatedPlural: originalData.translatedPlural,
+					},
+				} )
 			);
 	};
 
@@ -59,7 +67,10 @@ class Translatable extends Component {
 			<Button
 				primary
 				onClick={ noop }
-				disabled={ this.state.originalData.translatedSingular === this.props.singular }
+				disabled={
+					this.state.originalData.translatedSingular === this.state.formState.translatedSingular &&
+					this.state.originalData.translatedPlural === this.state.formState.translatedPlural
+				}
 			>
 				Submit a new translation
 			</Button>,
@@ -76,14 +87,18 @@ class Translatable extends Component {
 				<header className="community-translator__dialog-header">
 					<h2>Translate to { this.props.locale.name }</h2>
 					<nav>
-						<a
-							target="_blank"
-							rel="noopener noreferrer"
-							title="Open this translation in translate.wordpress.com"
-							href="https://translate.wordpress.com/"
-						>
-							<Gridicon icon="help" size={ 12 } />
-						</a>
+						{ this.state.translationUrl && (
+							<a
+								target="_blank"
+								rel="noopener noreferrer"
+								title="Open this translation in translate.wordpress.com"
+								href={ this.state.translationUrl }
+								className="community-translator__nav-link"
+							>
+								<Gridicon icon="external" size={ 12 } />
+							</a>
+						) }
+						<Gridicon icon="help" className="community-translator__nav-link" size={ 12 } />
 					</nav>
 				</header>
 				<section className="community-translator__dialog-body">
@@ -94,10 +109,22 @@ class Translatable extends Component {
 								className={ placeHolderClass }
 								id="community-translator__singular"
 								name="translatedSingular"
-								value={ this.state.originalData.translatedSingular }
+								value={ this.state.formState.translatedSingular }
 								onChange={ this.handleTranslationChange }
 							/>
 						</label>
+						{ this.state.formState.translatedPlural && (
+							<label htmlFor="community-translator__plural" className={ placeHolderClass }>
+								<span>{ this.props.plural }</span>
+								<textarea
+									className={ placeHolderClass }
+									id="community-translator__plural"
+									name="translatedPlural"
+									value={ this.state.formState.translatedPlural }
+									onChange={ this.handleTranslationChange }
+								/>
+							</label>
+						) }
 					</fieldset>
 				</section>
 			</div>
