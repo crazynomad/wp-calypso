@@ -78,7 +78,7 @@ const communityTranslatorJumpstart = {
 	},
 
 	wrapTranslation( originalFromPage, displayedTranslationFromPage, optionsFromPage ) {
-		if ( ! this.isEnabled() || ! this.isActivated() ) {
+		if ( ! this.isEnabled() || ! this.isActivated() || optionsFromPage.textOnly ) {
 			return displayedTranslationFromPage;
 		}
 
