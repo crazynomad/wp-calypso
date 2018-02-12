@@ -20,7 +20,6 @@ import WordPressLogo from 'components/wordpress-logo';
 import WordPressWordmark from 'components/wordpress-wordmark';
 import { getCurrentQueryArguments, getCurrentRoute } from 'state/selectors';
 import { login } from 'lib/paths';
-import { addQueryArgs } from 'lib/route';
 
 function getLoginUrl( redirectUri ) {
 	const params = { locale: getLocaleSlug() };
@@ -35,8 +34,8 @@ function getLoginUrl( redirectUri ) {
 }
 
 function getSignupUrl( currentRoute, query ) {
-	if ( '/log-in/jetpack' === currentRoute ) {
-		return addQueryArgs( query, '/jetpack/connect/authorize' );
+	if ( '/log-in/jetpack' === currentRoute && query.redirect_to ) {
+		return query.redirect_to;
 	}
 	return config( 'signup_url' );
 }
